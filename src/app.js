@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import _ from 'lodash';
 import watchedState from './view';
 import createItem from './list';
 
@@ -7,7 +6,7 @@ yup.setLocale({
   mixed: {
     notOneOf: 'This item exist',
   },
-})
+});
 
 const validate = (watched, value) => {
   const { todos } = watched;
@@ -64,16 +63,17 @@ export default () => {
     input: (evt) => {
       const { todos } = watched;
       const inputId = evt.target.getAttribute('data-id');
-      const mappingElementChecked = {
-        true: (item) => {item.checked = false},
-        false: (item) => {item.checked = true},
-      };
       todos.forEach((item) => {
+        const currentElement = item;
+        const mappingElementChecked = {
+          true: () => { currentElement.checked = false; },
+          false: () => { currentElement.checked = true; },
+        };
         if (item.id === inputId) {
-          mappingElementChecked[item.checked.toString()](item);
+          mappingElementChecked[item.checked.toString()]();
         }
       });
-    }
+    },
   };
 
   elements.form.addEventListener('submit', (evt) => {

@@ -21,7 +21,7 @@ const handlerStateForm = (value, elements) => {
       break;
     default:
       throw new Error(`${value} is unknown`);
-  };
+  }
 };
 
 export default (state, elements) => {
@@ -33,7 +33,7 @@ export default (state, elements) => {
         break;
       case 'todoForm.error':
         renderFeedback(value, elements);
-        break
+        break;
       case 'todos':
         renderList(value, elements);
         break;

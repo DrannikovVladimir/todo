@@ -1,5 +1,3 @@
-import item from './list';
-
 const renderFeedback = (error, elements) => {
   const { feedback } = elements;
   feedback.innerHTML = '';
@@ -37,22 +35,22 @@ const createTextContent = (item) => {
   const { name, id, checked } = item;
   const span = document.createElement('span');
   const mapping = {
-    true: (span) => span.style.textDecoration = 'line-through',
-    false: (span) => span.style.textDecoration = 'none',
+    true: () => { span.style.textDecoration = 'line-through'; },
+    false: () => { span.style.textDecoration = 'none'; },
   };
-  mapping[checked.toString()](span);
+  mapping[checked.toString()]();
   span.setAttribute('data-id', id);
   span.textContent = name;
 
   return span;
-}
+};
 
 const createItem = (item) => {
   const li = document.createElement('li');
   const checkLabel = createCheckLabel(item);
   const textContent = createTextContent(item);
   const buttonDelete = createButtonDelete(item);
-  li.append(checkLabel,textContent, buttonDelete);
+  li.append(checkLabel, textContent, buttonDelete);
 
   return li;
 };
@@ -68,6 +66,6 @@ const renderList = (todos, elements) => {
   });
 
   listContainer.append(ul);
-}
+};
 
 export { renderFeedback, renderList };
