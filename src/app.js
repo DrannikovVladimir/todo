@@ -1,9 +1,18 @@
 import * as yup from 'yup';
+import _ from 'lodash';
 import watchedState from './view';
 import createItem from './list';
 
-const validate = (value) => {
-  const schema = yup.string().required();
+yup.setLocale({
+  mixed: {
+    notOneOf: 'This item exist',
+  },
+})
+
+const validate = (watched, value) => {
+  const { todos } = watched;
+  const names = todos.map(({ name }) => name);
+  const schema = yup.string().required().notOneOf(names);
   try {
     schema.validateSync(value);
     return null;
@@ -14,7 +23,7 @@ const validate = (value) => {
 
 const updateValidationState = (watched, value) => {
   const { todoForm } = watched;
-  const error = validate(value);
+  const error = validate(watched, value);
   if (error) {
     todoForm.error = error;
     todoForm.valid = false;
@@ -31,7 +40,7 @@ export default () => {
       valid: false,
       error: null,
     },
-    todos: new Set(),
+    todos: [],
   };
 
   const elements = {
@@ -44,6 +53,29 @@ export default () => {
 
   const watched = watchedState(state, elements);
 
+  const handlerElementsMapping = {
+    button: (evt) => {
+      const buttonId = evt.target.getAttribute('data-id');
+      const { todos } = watched;
+      const todosId = todos.map(({ id }) => id);
+      const index = todosId.indexOf(buttonId);
+      todos.splice(index, 1);
+    },
+    input: (evt) => {
+      const { todos } = watched;
+      const inputId = evt.target.getAttribute('data-id');
+      const mappingElementChecked = {
+        true: (item) => {item.checked = false},
+        false: (item) => {item.checked = true},
+      };
+      todos.forEach((item) => {
+        if (item.id === inputId) {
+          mappingElementChecked[item.checked.toString()](item);
+        }
+      });
+    }
+  };
+
   elements.form.addEventListener('submit', (evt) => {
     evt.preventDefault();
     const formData = new FormData(evt.target);
@@ -54,9 +86,17 @@ export default () => {
       return;
     }
     watched.todoForm.status = 'processed';
-    watched.todoForm.status = 'finished';
     const newItem = createItem(value);
-    watched.todos.add(newItem);
+    watched.todos.push(newItem);
+    watched.todoForm.status = 'finished';
     watched.todoForm.status = 'filling';
+  });
+
+  elements.listContainer.addEventListener('click', (evt) => {
+    const currentTag = evt.target.tagName.toLowerCase();
+    if (currentTag !== 'button' && currentTag !== 'input') {
+      return;
+    }
+    handlerElementsMapping[currentTag](evt);
   });
 };

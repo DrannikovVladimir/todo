@@ -26,7 +26,7 @@ const handlerStateForm = (value, elements) => {
 
 export default (state, elements) => {
   const watched = onChange(state, (path, value) => {
-    console.log(path, value);
+    // console.log(path, value);
     switch (path) {
       case 'todoForm.status':
         handlerStateForm(value, elements);
